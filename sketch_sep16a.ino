@@ -61,8 +61,9 @@ void MoistChecking(int input) {
     //Allow circuit complete connection to power source
     digitalWrite(2, HIGH);
 
-    //Wait for five seconds of continous watering before checking for errors
-    delay(5 SECONDS);
+    //Wait for twenty seconds of continous watering before checking for errors
+    //Future me here, apparently there's not a good enough suction in the tubes to completely drain the tube in five seconds
+    delay(20 SECONDS);
     PowerControl(input);
   }
 }
