@@ -37,26 +37,24 @@ void loop() {
 
   if (!watered & !uncertWater) {
     MoistChecking(moist);
-  } else {
-    if (watered | uncertWater) {
-      if (debug) {
-        //Debug version of this to both showcase it works and to test stuff, will instead wait 10 seconds before repeating the loop
-        delay(SECONDS(10));
+  } else if (watered | uncertWater) {
+    if (debug) {
+      //Debug version of this to both showcase it works and to test stuff, will instead wait 10 seconds before repeating the loop
+      delay(SECONDS(10));
 
-        //Reset the variables as we are running in debug mode and there's a chance we might miss reseting them otherwise
-        uncertWater = false;
-        watered = false;
-      } else if (uncertWater) {
-        //Delay by 12 Hours before repeating the loop as we are uncertain if the plant has actually been watered
-        delay(HOURS(12));
-        uncertWater = false;
-      } else {
-        //If we have watered today then wait exactly 24 hours until we repeat this cycle.
-        delay(DAYS(1));
-      }
-      //It has been a day, the plant is checked if it needs watering yet again
+      //Reset the variables as we are running in debug mode and there's a chance we might miss reseting them otherwise
+      uncertWater = false;
       watered = false;
+    } else if (uncertWater) {
+      //Delay by 12 Hours before repeating the loop as we are uncertain if the plant has actually been watered
+      delay(HOURS(12));
+      uncertWater = false;
+    } else {
+      //If we have watered today then wait exactly 24 hours until we repeat this cycle.
+      delay(DAYS(1));
     }
+    //It has been an unknown specified amount of time (Probably 24 hours), the plant is checked if it needs watering yet again
+    watered = false;
   }
 }
 
