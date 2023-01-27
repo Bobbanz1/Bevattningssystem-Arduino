@@ -1,4 +1,13 @@
-#include "defines.h"
+#include "helper.h"
+
+//DEFINES
+
+//Moisture Sensor Pin
+#define MOIST_SENSOR_PIN A5
+//LED and Transistor controller Pin - Used to showcase both status of the System and to control the circuit current for the Water Valve.
+#define CONTROL_PIN 2
+//Debug LED Output Pin
+#define DEBUG_LED_PIN 3
 
 //Integer used to produce a readable output of what level of moisture the soil is currently at.
 int moist = 0;
@@ -11,9 +20,9 @@ bool debug = true;
 
 //MAIN CODE
 void setup() {
-  // put your setup code here, to run once:
-  pinMode(A5, INPUT);
-  pinMode(2, OUTPUT);
+  pinMode(MOIST_SENSOR_PIN, INPUT);
+  pinMode(CONTROL_PIN, OUTPUT);
+  pinMode(DEBUG_LED_PIN, OUTPUT);
   Serial.begin(9600);
 
   moist = analogRead(A5);
@@ -23,8 +32,8 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   Serial.println(moist);
-  if (analogRead(A5) != moist) {
-    moist = analogRead(A5);
+  if (analogRead(MOIST_SENSOR_PIN) != moist) {
+    moist = analogRead(MOIST_SENSOR_PIN);
   }
 
   if (!watered & !uncertWater) {
@@ -54,12 +63,15 @@ void loop() {
 
 
 void MoistChecking(int input) {
+  if(debug)
+    //Debug LED, used to showcase the circuit is in debug mode
+    digitalWrite(DEBUG_LED_PIN, HIGH);
+    
   if (input <= 50) {
     //Allow circuit complete connection to power source
-    digitalWrite(2, HIGH);
+    digitalWrite(CONTROL_PIN, HIGH);
 
-    //Wait for twenty seconds of continous watering before checking for errors
-    //Future me here, apparently there's not a good enough suction in the tubes to completely drain the tube in five seconds
+    //Waits for twenty seconds of continous watering before checking for errors and power control
     delay(SECONDS(20));
     PowerControl(input);
   }
@@ -70,7 +82,7 @@ void PowerControl(int check) {
   //Check to see if the system is telling us that there still hasn't been any watering done, in which case we allow for an error of margin.
   if (check <= 50) {
     //Terminates Ground connection to power source
-    digitalWrite(2, LOW);
+    digitalWrite(CONTROL_PIN, LOW);
 
     //We have watered the plant, however due to the resulting conflicting inputs, we are instead waiting for half the usual time.
     uncertWater = true;
@@ -79,7 +91,7 @@ void PowerControl(int check) {
   //If no error has been detected then terminate the connection
   if (check >= 100) {
     //Terminates Ground connection to power source
-    digitalWrite(2, LOW);
+    digitalWrite(CONTROL_PIN, LOW);
 
     //We have watered the plant
     watered = true;
