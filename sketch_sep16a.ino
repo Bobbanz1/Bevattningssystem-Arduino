@@ -28,7 +28,6 @@ void setup() {
   moist = analogRead(A5);
 }
 
-
 void loop() {
   // put your main code here, to run repeatedly:
   Serial.println(moist);
@@ -61,7 +60,12 @@ void loop() {
   }
 }
 
-
+/**
+ * MoistChecking
+ * 
+ * @brief Checks the moisture level of the soil and if it is below a certain threshold, it will allow the circuit to complete and water the plant.
+ * @param input The current moisture level of the soil
+ */
 void MoistChecking(int input) {
   if(debug)
     //Debug LED, used to showcase the circuit is in debug mode
@@ -77,7 +81,12 @@ void MoistChecking(int input) {
   }
 }
 
-
+/**
+ * PowerControl
+ * 
+ * @brief Checks to see if the system is telling us that there still hasn't been any watering done, in which case we allow for an error of margin.
+ * @param check The current moisture level of the soil
+ */
 void PowerControl(int check) {
   //Check to see if the system is telling us that there still hasn't been any watering done, in which case we allow for an error of margin.
   if (check <= 50) {
