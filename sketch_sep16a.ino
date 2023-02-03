@@ -6,8 +6,6 @@
 #define MOIST_SENSOR_PIN A5
 //LED and Transistor controller Pin - Used to showcase both status of the System and to control the circuit current for the Water Valve.
 #define CONTROL_PIN 2
-//Debug LED Output Pin
-#define DEBUG_LED_PIN 3
 
 //Integer used to produce a readable output of what level of moisture the soil is currently at.
 int moist = 0;
@@ -15,14 +13,13 @@ int moist = 0;
 bool watered = false;
 //Boolean used to determine if the plant could potentially have been watered according to the code however the sensors are still detecting it as unwatered.
 bool uncertWater = false;
-//Change this to true if you're currently debugging the code and don't want to wait an entire day for the next watering.
-bool debug = true;
+//Change this to 'true' if you're currently debugging the code and don't want to wait an entire day for the next watering.
+bool debug = false;
 
 //MAIN CODE
 void setup() {
   pinMode(MOIST_SENSOR_PIN, INPUT);
   pinMode(CONTROL_PIN, OUTPUT);
-  pinMode(DEBUG_LED_PIN, OUTPUT);
   Serial.begin(9600);
 
   moist = analogRead(A5);
@@ -35,12 +32,12 @@ void loop() {
     moist = analogRead(MOIST_SENSOR_PIN);
   }
 
-  if (!watered & !uncertWater) {
+  if (!watered && !uncertWater) {
     MoistChecking(moist);
-  } else if (watered | uncertWater) {
+  } else if (watered || uncertWater) {
     if (debug) {
       //Debug version of this to both showcase it works and to test stuff, will instead wait 10 seconds before repeating the loop
-      delay(SECONDS(10));
+      delay(SECONDS(5));
 
       //Reset the variables as we are running in debug mode and there's a chance we might miss reseting them otherwise
       uncertWater = false;
@@ -65,11 +62,7 @@ void loop() {
    @param input The current moisture level of the soil
 */
 void MoistChecking(int input) {
-  if (debug)
-    //Debug LED, used to showcase the circuit is in debug mode
-    digitalWrite(DEBUG_LED_PIN, HIGH);
-
-  if (input <= 50) {
+  if (input <= 500) {
     //Allow circuit complete connection to power source
     digitalWrite(CONTROL_PIN, HIGH);
 
@@ -87,7 +80,7 @@ void MoistChecking(int input) {
 */
 void PowerControl(int check) {
   //Check to see if the system is telling us that there still hasn't been any watering done, in which case we allow for an error of margin.
-  if (check <= 50) {
+  if (check <= 100) {
     //Terminates Ground connection to power source
     digitalWrite(CONTROL_PIN, LOW);
 
@@ -96,7 +89,7 @@ void PowerControl(int check) {
   }
 
   //If no error has been detected then terminate the connection
-  if (check >= 100) {
+  if (check >= 500) {
     //Terminates Ground connection to power source
     digitalWrite(CONTROL_PIN, LOW);
 
